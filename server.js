@@ -3,7 +3,10 @@ import bodyParser from "body-parser";
 import cors from "cors"
 import { properties } from "./src/config/properties.js";
 import {connectDB} from "./src/config/dbConnection.js"
-
+import {authRoute} from "./src/api/route/auth.js"
+import {projectRoute} from "./src/api/route/project.js"
+import {circuitRoute} from "./src/api/route/circuit.js"
+import {protectRoute} from "./src/api/middleware/protectRoute.js"
 const app = express();
 
 connectDB(properties?.MONGO_URI).catch((err) => console.log("MongooDb connection error\n",err));
@@ -27,6 +30,12 @@ const corsOption = {
 app.use(cors(corsOption))
 app.use(bodyParser.json());
 app.options("*", cors(corsOption))
+
+
+//Route
+app.use("/api", authRoute);
+app.use("/api", protectRoute, projectRoute);
+app.use("/api",protectRoute, circuitRoute)
 
 const PORT = properties?.PORT;
 
